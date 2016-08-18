@@ -1,0 +1,5 @@
+Deploy VPC(3-Tier)
+Include VPC, IGW, Subnet, NACL, Route Table, Security Group
+
+Deploy 2 Instance sepreate 2 AZ
+Parameter AMI ID/ PrivateIP/ Security Group
