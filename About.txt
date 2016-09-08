@@ -1,5 +1,9 @@
 Deploy VPC(3-Tier)
-Include VPC, IGW, Subnet, NACL, Route Table, Security Group
+Include VPC, IGW, Subnets, NACLs, Route Tables, Security Groups.
+Subnets: There are three subnet pairs and every subnet pair design for cross AZ. One of subnet pair is public and others are private for serve applicaion/database(RDS) instances.
+NACLs: There is three tier NACL. NACL for public subnet allow any port form any where(0.0.0.0/0). NACL for application subnet allow any traffic form public subnet and few traffic type form db tier.
 
-Deploy 2 Instance sepreate 2 AZ
-Parameter AMI ID/ PrivateIP/ Security Group
+Deploy VPC(2-Tier)
+Include VPC, IGW, Subnets, NACLs, Route Tables, Security Groups
+
+Security Best Practice from AWS:
