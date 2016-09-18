@@ -869,7 +869,6 @@
                         "Value": "Private"
                     },
 					{
-					{
                         "Key": "Zone",
                         "Value": "Database"
                     }
@@ -898,7 +897,6 @@
                         "Value": "Private"
                     },
 					{
-					{
                         "Key": "Zone",
                         "Value": "Database"
                     }
@@ -926,7 +924,6 @@
                         "Key": "Network",
                         "Value": "Private"
                     },
-					{
 					{
                         "Key": "Zone",
                         "Value": "Database"
