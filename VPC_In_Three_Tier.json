@@ -175,7 +175,7 @@
                     "Fn::Select": [
                         "0",
                         {
-                            "Ref": "AvailabilityZones"
+                            "Fn::GetAZs" : "" 
                         }
                     ]
                 },
@@ -205,7 +205,7 @@
                     "Fn::Select": [
                         "1",
                         {
-                            "Ref": "AvailabilityZones"
+                            "Fn::GetAZs" : ""
                         }
                     ]
                 },
@@ -235,7 +235,7 @@
                     "Fn::Select": [
                         "0",
                         {
-                            "Ref": "AvailabilityZones"
+                            "Fn::GetAZs" : ""
                         }
                     ]
                 },
@@ -265,7 +265,7 @@
                     "Fn::Select": [
                         "1",
                         {
-                            "Ref": "AvailabilityZones"
+                            "Fn::GetAZs" : ""
                         }
                     ]
                 },
@@ -295,7 +295,7 @@
                     "Fn::Select": [
                         "0",
                         {
-                            "Ref": "AvailabilityZones"
+                            "Fn::GetAZs" : ""
                         }
                     ]
                 },
@@ -325,7 +325,7 @@
                     "Fn::Select": [
                         "1",
                         {
-                            "Ref": "AvailabilityZones"
+                            "Fn::GetAZs" : ""
                         }
                     ]
                 },
@@ -443,7 +443,7 @@
       "Type" : "AWS::EC2::Route",
       "DependsOn" : "AttachGateway",
       "Properties" : {
-        "RouteTableId" : { "Ref" : "PublicRouteTable" },
+        "RouteTableId" : { "Ref" : "DMZRouteTable" },
         "DestinationCidrBlock" : "0.0.0.0/0",
         "GatewayId" : { "Ref" : "InternetGateway" }
       }
@@ -832,9 +832,7 @@
 		 "Tags" : [
                     {
                         "Key": "Name",
-                        "Value": {
-							"Ref" : "SSH Bastion"
-						}
+                        "Value": "SSH Bastion"
                     },
                     {
                         "Key": "Network",
@@ -860,9 +858,7 @@
 		 "Tags" : [
                     {
                         "Key": "Name",
-                        "Value": {
-							"Ref" : "MySQL Default Port"
-						}
+                        "Value": "MySQL Default Port"
                     },
                     {
                         "Key": "Network",
@@ -888,9 +884,7 @@
 		 "Tags" : [
                     {
                         "Key": "Name",
-                        "Value": {
-							"Ref" : "PostgreSQL Default Port"
-						}
+                        "Value": "PostgreSQL Default Port"
                     },
                     {
                         "Key": "Network",
@@ -916,9 +910,7 @@
 		 "Tags" : [
                     {
                         "Key": "Name",
-                        "Value": {
-							"Ref" : "Oracle Default Port"
-						}
+                        "Value": "Oracle Default Port"
                     },
                     {
                         "Key": "Network",
@@ -944,9 +936,7 @@
 		 "Tags" : [
                     {
                         "Key": "Name",
-                        "Value": {
-							"Ref" : "MSSQL Default"
-						}
+                        "Value": "MSSQL Default"
                     },
                     {
                         "Key": "Network",
