@@ -3,6 +3,68 @@
 
   "Description" : "There is 3-tier VPC with a SSH Bastion. ***NOTICE*** Before you create this VPC stack, you must create an key pair by using console or CLI.",
 
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "VPCCIDR",
+            "DMZSubnet1CIDR",
+            "DMZSubnet2CIDR",
+            "AppSubnet1CIDR",
+            "AppSubnet2CIDR",
+            "DBSubnet1CIDR",
+            "DBSubnet2CIDR"
+          ]
+        },
+        {
+          "Label": {
+            "default": "SSH Bastion Server Configuration"
+          },
+          "Parameters": [
+            "InstanceType",
+            "KeyName",
+            "SSHLocation"
+          ]
+        }
+		],
+      "ParameterLabels": {
+        "VPCCIDR": {
+          "default": "VPC Size"
+        },
+		"DMZSubnet1CIDR": {
+          "default": "DMZ Subnet Size(AZ1)"
+        },
+		"DMZSubnet2CIDR": {
+          "default": "DMZ Subnet Size(AZ2)"
+        },
+		"AppSubnet1CIDR": {
+          "default": "Application Subnet Size(AZ1)"
+        },
+		"AppSubnet2CIDR": {
+          "default": "Application Subnet Size(AZ2)"
+        },
+		"DBSubnet1CIDR": {
+          "default": "Database Subnet Size(AZ1)"
+        },
+		"DBSubnet2CIDR": {
+          "default": "Database Subnet Size(AZ2)"
+        },
+		"InstanceType": {
+          "default": "Instance Type of SSH Bastion Server"
+        },
+		"KeyName": {
+          "default": "SSH Key of SSH Bastion Server"
+        },
+		"SSHLocation": {
+          "default": "Allow IP/IP Range SSH Bastion Server"
+        }
+	  }
+	}
+  },
   "Parameters" : {
     "VPCCIDR": {
       "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
@@ -439,7 +501,7 @@
                 ]
       }
     },
-    "Route" : {
+    "DMZRoute" : {
       "Type" : "AWS::EC2::Route",
       "DependsOn" : "AttachGateway",
       "Properties" : {
@@ -462,6 +524,38 @@
       "Properties" : {
         "SubnetId" : { "Ref" : "DMZSubnet2" },
         "RouteTableId" : { "Ref" : "DMZRouteTable" }
+      }
+    },
+	
+	"AppSubnet1RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "AppSubnet1" },
+        "RouteTableId" : { "Ref" : "AppRouteTable" }
+      }
+    },
+
+	"AppSubnet2RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "AppSubnet2" },
+        "RouteTableId" : { "Ref" : "AppRouteTable" }
+      }
+    },
+	
+	"DBSubnet1RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "DBSubnet1" },
+        "RouteTableId" : { "Ref" : "DBRouteTable" }
+      }
+    },
+
+	"DBSubnet2RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "DBSubnet2" },
+        "RouteTableId" : { "Ref" : "DBRouteTable" }
       }
     },
 	
@@ -590,7 +684,7 @@
       "Type" : "AWS::EC2::NetworkAclEntry",
       "Properties" : {
         "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "120",
+        "RuleNumber" : "130",
         "Protocol" : "6",
         "RuleAction" : "allow",
         "Egress" : "false",
@@ -722,7 +816,7 @@
       "Type" : "AWS::EC2::NetworkAclEntry",
       "Properties" : {
         "NetworkAclId" : {"Ref" : "DBSubnetNetworkAcl"},
-        "RuleNumber" : "110",
+        "RuleNumber" : "120",
         "Protocol" : "-1",
         "RuleAction" : "allow",
         "Egress" : "false",
@@ -734,7 +828,7 @@
       "Type" : "AWS::EC2::NetworkAclEntry",
       "Properties" : {
         "NetworkAclId" : {"Ref" : "DBSubnetNetworkAcl"},
-        "RuleNumber" : "110",
+        "RuleNumber" : "120",
         "Protocol" : "-1",
         "RuleAction" : "allow",
         "Egress" : "true",
