@@ -13,7 +13,7 @@ Deploy Three Tier Architecture VPC - NAT Gateway Ver.
 
 Deploy Three Tier Architecture VPC - Higher Security Ver.
 
-
-
 Deploy VPC(2-Tier)
 Include VPC, IGW, Subnets, NACLs, Route Tables, Security Groups
+
+Still in process...
