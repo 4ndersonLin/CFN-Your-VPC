@@ -1,1087 +1,1242 @@
 {
-  "AWSTemplateFormatVersion" : "2010-09-09",
+	"AWSTemplateFormatVersion" : "2010-09-09",
 
-  "Description" : "There is 3-tier VPC with a SSH Bastion. ***NOTICE*** Before you create this VPC stack, you must create an key pair by using console or CLI.",
+	"Description" : "There is a basic 3-tier VPC.",
 
-  "Metadata": {
-    "AWS::CloudFormation::Interface": {
-      "ParameterGroups": [
-        {
-          "Label": {
-            "default": "Network Configuration"
-          },
-          "Parameters": [
-            "VPCCIDR",
-            "DMZSubnet1CIDR",
-            "DMZSubnet2CIDR",
-            "AppSubnet1CIDR",
-            "AppSubnet2CIDR",
-            "DBSubnet1CIDR",
-            "DBSubnet2CIDR"
-          ]
-        },
-        {
-          "Label": {
-            "default": "SSH Bastion Server Configuration"
-          },
-          "Parameters": [
-            "InstanceType",
-            "KeyName",
-            "SSHLocation"
-          ]
-        }
-		],
-      "ParameterLabels": {
-        "VPCCIDR": {
-          "default": "VPC Size"
-        },
-		"DMZSubnet1CIDR": {
-          "default": "DMZ Subnet Size(AZ1)"
-        },
-		"DMZSubnet2CIDR": {
-          "default": "DMZ Subnet Size(AZ2)"
-        },
-		"AppSubnet1CIDR": {
-          "default": "Application Subnet Size(AZ1)"
-        },
-		"AppSubnet2CIDR": {
-          "default": "Application Subnet Size(AZ2)"
-        },
-		"DBSubnet1CIDR": {
-          "default": "Database Subnet Size(AZ1)"
-        },
-		"DBSubnet2CIDR": {
-          "default": "Database Subnet Size(AZ2)"
-        },
-		"InstanceType": {
-          "default": "Instance Type of SSH Bastion Server"
-        },
-		"KeyName": {
-          "default": "SSH Key of SSH Bastion Server"
-        },
-		"SSHLocation": {
-          "default": "Allow IP/IP Range SSH Bastion Server"
-        }
-	  }
-	}
-  },
-  "Parameters" : {
-    "VPCCIDR": {
-      "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
-      "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-      "Default": "10.0.0.0/16",
-      "Description": "CIDR Block for the VPC",
-      "Type": "String"
-    },
-	"DMZSubnet1CIDR": {
-		"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
-		"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-		"Default": "10.0.0.0/24",
-		"Description": "CIDR Block for the public DMZ subnet 1 located in Availability Zone 1",
-		"Type": "String"
-	},
-	"DMZSubnet2CIDR": {
-		"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
-		"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-		"Default": "10.0.1.0/24",
-		"Description": "CIDR Block for the public DMZ subnet 2 located in Availability Zone 2",
-		"Type": "String"
-	},
-	"AppSubnet1CIDR": {
-		"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
-		"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-		"Default": "10.0.2.0/24",
-		"Description": "CIDR block for the private application subnet 1 located in Availability Zone 1.",
-		"Type": "String"
-	},
-	"AppSubnet2CIDR": {
-		"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
-		"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-		"Default": "10.0.3.0/24",
-		"Description": "CIDR block for the private application subnet 2 located in Availability Zone 2.",
-		"Type": "String"
-	},
-	"DBSubnet1CIDR": {
-		"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
-		"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-		"Default": "10.0.4.0/24",
-		"Description": "CIDR block for the private database subnet 1 located in Availability Zone 1.",
-		"Type": "String"
-	},
-	"DBSubnet2CIDR": {
-		"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
-		"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-		"Default": "10.0.5.0/24",
-		"Description": "CIDR block for the private database subnet 2 located in Availability Zone 2.",
-		"Type": "String"
-	},	
-    "InstanceType" : {
-      "Description" : "SSH Prxoy EC2 instance type",
-      "Type" : "String",
-      "Default" : "t2.micro",
-      "AllowedValues" : [ "t1.micro", "t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "g2.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"]
-,
-      "ConstraintDescription" : "must be a valid EC2 instance type."
-    },
-
-    "KeyName": {
-      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-      "Type": "AWS::EC2::KeyPair::KeyName",
-      "ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
-    },
-    
-    "SSHLocation" : {
-      "Description" : " The IP address range that can be used to SSH to the EC2 instances",
-      "Type": "String",
-      "MinLength": "9",
-      "MaxLength": "18",
-      "Default": "0.0.0.0/0",
-      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
-    }
-  },
-
-  "Mappings" : {
-    
-    "AWSInstanceType2Arch" : {
-      "t1.micro"    : { "Arch" : "PV64"   },
-      "t2.nano"     : { "Arch" : "HVM64"  },
-      "t2.micro"    : { "Arch" : "HVM64"  },
-      "t2.small"    : { "Arch" : "HVM64"  },
-      "t2.medium"   : { "Arch" : "HVM64"  },
-      "t2.large"    : { "Arch" : "HVM64"  },
-      "m1.small"    : { "Arch" : "PV64"   },
-      "m1.medium"   : { "Arch" : "PV64"   },
-      "m1.large"    : { "Arch" : "PV64"   },
-      "m1.xlarge"   : { "Arch" : "PV64"   },
-      "m2.xlarge"   : { "Arch" : "PV64"   },
-      "m2.2xlarge"  : { "Arch" : "PV64"   },
-      "m2.4xlarge"  : { "Arch" : "PV64"   },
-      "m3.medium"   : { "Arch" : "HVM64"  },
-      "m3.large"    : { "Arch" : "HVM64"  },
-      "m3.xlarge"   : { "Arch" : "HVM64"  },
-      "m3.2xlarge"  : { "Arch" : "HVM64"  },
-      "m4.large"    : { "Arch" : "HVM64"  },
-      "m4.xlarge"   : { "Arch" : "HVM64"  },
-      "m4.2xlarge"  : { "Arch" : "HVM64"  },
-      "m4.4xlarge"  : { "Arch" : "HVM64"  },
-      "m4.10xlarge" : { "Arch" : "HVM64"  },
-      "c1.medium"   : { "Arch" : "PV64"   },
-      "c1.xlarge"   : { "Arch" : "PV64"   },
-      "c3.large"    : { "Arch" : "HVM64"  },
-      "c3.xlarge"   : { "Arch" : "HVM64"  },
-      "c3.2xlarge"  : { "Arch" : "HVM64"  },
-      "c3.4xlarge"  : { "Arch" : "HVM64"  },
-      "c3.8xlarge"  : { "Arch" : "HVM64"  },
-      "c4.large"    : { "Arch" : "HVM64"  },
-      "c4.xlarge"   : { "Arch" : "HVM64"  },
-      "c4.2xlarge"  : { "Arch" : "HVM64"  },
-      "c4.4xlarge"  : { "Arch" : "HVM64"  },
-      "c4.8xlarge"  : { "Arch" : "HVM64"  },
-      "g2.2xlarge"  : { "Arch" : "HVMG2"  },
-      "g2.8xlarge"  : { "Arch" : "HVMG2"  },
-      "r3.large"    : { "Arch" : "HVM64"  },
-      "r3.xlarge"   : { "Arch" : "HVM64"  },
-      "r3.2xlarge"  : { "Arch" : "HVM64"  },
-      "r3.4xlarge"  : { "Arch" : "HVM64"  },
-      "r3.8xlarge"  : { "Arch" : "HVM64"  },
-      "i2.xlarge"   : { "Arch" : "HVM64"  },
-      "i2.2xlarge"  : { "Arch" : "HVM64"  },
-      "i2.4xlarge"  : { "Arch" : "HVM64"  },
-      "i2.8xlarge"  : { "Arch" : "HVM64"  },
-      "d2.xlarge"   : { "Arch" : "HVM64"  },
-      "d2.2xlarge"  : { "Arch" : "HVM64"  },
-      "d2.4xlarge"  : { "Arch" : "HVM64"  },
-      "d2.8xlarge"  : { "Arch" : "HVM64"  },
-      "hi1.4xlarge" : { "Arch" : "HVM64"  },
-      "hs1.8xlarge" : { "Arch" : "HVM64"  },
-      "cr1.8xlarge" : { "Arch" : "HVM64"  },
-      "cc2.8xlarge" : { "Arch" : "HVM64"  }
-    },
-
-    "AWSRegionArch2AMI" : {
-      "us-east-1"        : {"PV64" : "ami-2a69aa47", "HVM64" : "ami-6869aa05", "HVMG2" : "ami-2e5e9c43"},
-      "us-west-2"        : {"PV64" : "ami-7f77b31f", "HVM64" : "ami-7172b611", "HVMG2" : "ami-83b770e3"},
-      "us-west-1"        : {"PV64" : "ami-a2490dc2", "HVM64" : "ami-31490d51", "HVMG2" : "ami-fd76329d"},
-      "eu-west-1"        : {"PV64" : "ami-4cdd453f", "HVM64" : "ami-f9dd458a", "HVMG2" : "ami-b9bd25ca"},
-      "eu-central-1"     : {"PV64" : "ami-6527cf0a", "HVM64" : "ami-ea26ce85", "HVMG2" : "ami-7f04ec10"},
-      "ap-northeast-1"   : {"PV64" : "ami-3e42b65f", "HVM64" : "ami-374db956", "HVMG2" : "ami-e0ee1981"},
-      "ap-northeast-2"   : {"PV64" : "NOT_SUPPORTED", "HVM64" : "ami-2b408b45", "HVMG2" : "NOT_SUPPORTED"},
-      "ap-southeast-1"   : {"PV64" : "ami-df9e4cbc", "HVM64" : "ami-a59b49c6", "HVMG2" : "ami-0cb5676f"},
-      "ap-southeast-2"   : {"PV64" : "ami-63351d00", "HVM64" : "ami-dc361ebf", "HVMG2" : "ami-a71c34c4"},
-      "ap-south-1"       : {"PV64" : "NOT_SUPPORTED", "HVM64" : "ami-ffbdd790", "HVMG2" : "ami-f5b2d89a"},
-      "sa-east-1"        : {"PV64" : "ami-1ad34676", "HVM64" : "ami-6dd04501", "HVMG2" : "NOT_SUPPORTED"},
-      "cn-north-1"       : {"PV64" : "ami-77559f1a", "HVM64" : "ami-8e6aa0e3", "HVMG2" : "NOT_SUPPORTED"}
-    }
-
-  },
-
-  "Resources" : {
-
-    "VPC" : {
-      "Type" : "AWS::EC2::VPC",
-      "Properties" : {
-        "CidrBlock" : {
-                    "Ref": "VPCCIDR"
-                },
-        "Tags" : [ {"Key" : "Name", "Value" : { "Ref" : "AWS::StackName"} } ]
-      }
-    },
-
-    "DMZSubnet1" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "CidrBlock" : { "Ref" : "DMZSubnet1CIDR" },
-		"AvailabilityZone": {
-                    "Fn::Select": [
-                        "0",
-                        {
-                            "Fn::GetAZs" : "" 
-                        }
-                    ]
-                },
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "DMZ subnet 1"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    },
-                    {
-                        "Key": "Zone",
-                        "Value": "DMZ"
-                    }
-                ]
-      }
-    },
-
-    "DMZSubnet2" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "CidrBlock" : { "Ref" : "DMZSubnet2CIDR" },
-		"AvailabilityZone": {
-                    "Fn::Select": [
-                        "1",
-                        {
-                            "Fn::GetAZs" : ""
-                        }
-                    ]
-                },
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "DMZ subnet 2"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    },
-                    {
-                        "Key": "Zone",
-                        "Value": "DMZ"
-                    }
-                ]
-      }
-    },	
-	
-	"AppSubnet1" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "CidrBlock" : { "Ref" : "AppSubnet1CIDR" },
-		"AvailabilityZone": {
-                    "Fn::Select": [
-                        "0",
-                        {
-                            "Fn::GetAZs" : ""
-                        }
-                    ]
-                },
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "Application subnet 1"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-                    {
-                        "Key": "Zone",
-                        "Value": "Application"
-                    }
-                ]
-      }
-    },
-
-	"AppSubnet2" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "CidrBlock" : { "Ref" : "AppSubnet2CIDR" },
-		"AvailabilityZone": {
-                    "Fn::Select": [
-                        "1",
-                        {
-                            "Fn::GetAZs" : ""
-                        }
-                    ]
-                },
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "Application subnet 2"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-                    {
-                        "Key": "Zone",
-                        "Value": "Application"
-                    }
-                ]
-      }
-    },
-
-	"DBSubnet1" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "CidrBlock" : { "Ref" : "DBSubnet1CIDR" },
-		"AvailabilityZone": {
-                    "Fn::Select": [
-                        "0",
-                        {
-                            "Fn::GetAZs" : ""
-                        }
-                    ]
-                },
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "Database subnet 1"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-                    {
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },
-
-	"DBSubnet2" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "CidrBlock" : { "Ref" : "DBSubnet2CIDR" },
-		"AvailabilityZone": {
-                    "Fn::Select": [
-                        "1",
-                        {
-                            "Fn::GetAZs" : ""
-                        }
-                    ]
-                },
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "Database subnet 2"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-                    {
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },
-	
-    "InternetGateway" : {
-      "Type" : "AWS::EC2::InternetGateway",
-      "Properties" : {
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": {
-							"Ref" : "AWS::StackName"
-						}
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    }
-                ]
-      }
-    },
-
-    "AttachGateway" : {
-       "Type" : "AWS::EC2::VPCGatewayAttachment",
-       "Properties" : {
-         "VpcId" : { "Ref" : "VPC" },
-         "InternetGatewayId" : { "Ref" : "InternetGateway" }
-       }
-    },
-
-    "DMZRouteTable" : {
-      "Type" : "AWS::EC2::RouteTable",
-      "Properties" : {
-        "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": {
-							"Ref" : "AWS::StackName"
-						}
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "DMZ"
-                    }
-                ]
-      }	  
-    },
-	
-    "AppRouteTable" : {
-      "Type" : "AWS::EC2::RouteTable",
-      "Properties" : {
-        "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": {
-							"Ref" : "AWS::StackName"
-						}
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Application"
-                    }
-                ]
-      }
-    },
-	"DBRouteTable" : {
-      "Type" : "AWS::EC2::RouteTable",
-      "Properties" : {
-        "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": {
-							"Ref" : "AWS::StackName"
-						}
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },
-    "DMZRoute" : {
-      "Type" : "AWS::EC2::Route",
-      "DependsOn" : "AttachGateway",
-      "Properties" : {
-        "RouteTableId" : { "Ref" : "DMZRouteTable" },
-        "DestinationCidrBlock" : "0.0.0.0/0",
-        "GatewayId" : { "Ref" : "InternetGateway" }
-      }
-    },
-
-    "DMZSubnet1RouteTableAssociation" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DMZSubnet1" },
-        "RouteTableId" : { "Ref" : "DMZRouteTable" }
-      }
-    },
-
-	"DMZSubnet2RouteTableAssociation" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DMZSubnet2" },
-        "RouteTableId" : { "Ref" : "DMZRouteTable" }
-      }
-    },
-	
-	"AppSubnet1RouteTableAssociation" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "AppSubnet1" },
-        "RouteTableId" : { "Ref" : "AppRouteTable" }
-      }
-    },
-
-	"AppSubnet2RouteTableAssociation" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "AppSubnet2" },
-        "RouteTableId" : { "Ref" : "AppRouteTable" }
-      }
-    },
-	
-	"DBSubnet1RouteTableAssociation" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DBSubnet1" },
-        "RouteTableId" : { "Ref" : "DBRouteTable" }
-      }
-    },
-
-	"DBSubnet2RouteTableAssociation" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DBSubnet2" },
-        "RouteTableId" : { "Ref" : "DBRouteTable" }
-      }
-    },
-	
-    "DMZSubnetNetworkAcl" : {
-      "Type" : "AWS::EC2::NetworkAcl",
-      "Properties" : {
-        "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": {
-							"Ref" : "AWS::StackName"
-						}
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "DMZ"
-                    }
-                ]
-      }
-    },
-
-    "AppSubnetNetworkAcl" : {
-      "Type" : "AWS::EC2::NetworkAcl",
-      "Properties" : {
-        "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": {
-							"Ref" : "AWS::StackName"
-						}
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Application"
-                    }
-                ]
-      }
-    },	
-	
-    "DBSubnetNetworkAcl" : {
-      "Type" : "AWS::EC2::NetworkAcl",
-      "Properties" : {
-        "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": {
-							"Ref" : "AWS::StackName"
-						}
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },
-	
-    "DMZInboundSSHNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "110",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "false",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "22", "To" : "22"}
-      }
-    },
-
-    "DMZOutBoundSSHNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "110",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "true",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "22", "To" : "22"}
-      }
-    },
-	
-	"DMZInboundHttpNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "120",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "false",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "80", "To" : "80"}
-      }
-    },
-
-    "DMZOutBoundHttpNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "120",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "true",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "80", "To" : "80"}
-      }
-    },
-
-	"DMZInboundHttpsNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "130",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "false",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "443", "To" : "443"}
-      }
-    },
-
-    "DMZOutBoundHttpsNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "130",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "true",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "443", "To" : "443"}
-      }
-    },
-
-	"DMZInboundHighNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "140",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "false",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "1024", "To" : "65535"}
-      }
-    },
-
-    "DMZOutBoundHighNetworkAclEntry" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DMZSubnetNetworkAcl"},
-        "RuleNumber" : "140",
-        "Protocol" : "6",
-        "RuleAction" : "allow",
-        "Egress" : "true",
-        "CidrBlock" : "0.0.0.0/0",
-        "PortRange" : {"From" : "1024", "To" : "65535"}
-      }
-    },
-	
-    "DMZSubnet1NetworkAclAssociation" : {
-      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DMZSubnet1" },
-        "NetworkAclId" : { "Ref" : "DMZSubnetNetworkAcl" }
-      }
-    },
-
-	"DMZSubnet2NetworkAclAssociation" : {
-      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DMZSubnet2" },
-        "NetworkAclId" : { "Ref" : "DMZSubnetNetworkAcl" }
-      }
-    },
-
-    "AppInboundAllNetworkAclEntry1" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "AppSubnetNetworkAcl"},
-        "RuleNumber" : "110",
-        "Protocol" : "-1",
-        "RuleAction" : "allow",
-        "Egress" : "false",
-        "CidrBlock" : {"Ref" : "VPCCIDR"}
-      }
-    },
-
-    "AppOutBoundAllNetworkAclEntry1" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "AppSubnetNetworkAcl"},
-        "RuleNumber" : "110",
-        "Protocol" : "-1",
-        "RuleAction" : "allow",
-        "Egress" : "true",
-        "CidrBlock" : {"Ref" : "VPCCIDR"}
-      }
-    },
-
-    "AppSubnet1NetworkAclAssociation" : {
-      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "AppSubnet1" },
-        "NetworkAclId" : { "Ref" : "AppSubnetNetworkAcl" }
-      }
-    },
-
-	"AppSubnet2NetworkAclAssociation" : {
-      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "AppSubnet2" },
-        "NetworkAclId" : { "Ref" : "AppSubnetNetworkAcl" }
-      }
-    },
-
-	"DBInboundAllNetworkAclEntry1" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DBSubnetNetworkAcl"},
-        "RuleNumber" : "110",
-        "Protocol" : "-1",
-        "RuleAction" : "allow",
-        "Egress" : "false",
-        "CidrBlock" : {"Ref" : "AppSubnet1CIDR"}
-      }
-    },
-
-    "DBOutBoundAllNetworkAclEntry1" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DBSubnetNetworkAcl"},
-        "RuleNumber" : "110",
-        "Protocol" : "-1",
-        "RuleAction" : "allow",
-        "Egress" : "true",
-        "CidrBlock" : {"Ref" : "AppSubnet1CIDR"}
-      }
-    },
-	
-	"DBInboundAllNetworkAclEntry2" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DBSubnetNetworkAcl"},
-        "RuleNumber" : "120",
-        "Protocol" : "-1",
-        "RuleAction" : "allow",
-        "Egress" : "false",
-        "CidrBlock" : {"Ref" : "AppSubnet2CIDR"}
-      }
-    },
-
-    "DBOutBoundAllNetworkAclEntry2" : {
-      "Type" : "AWS::EC2::NetworkAclEntry",
-      "Properties" : {
-        "NetworkAclId" : {"Ref" : "DBSubnetNetworkAcl"},
-        "RuleNumber" : "120",
-        "Protocol" : "-1",
-        "RuleAction" : "allow",
-        "Egress" : "true",
-        "CidrBlock" : {"Ref" : "AppSubnet2CIDR"}
-      }
-    },	
-
-	"DBSubnet1NetworkAclAssociation" : {
-      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DBSubnet1" },
-        "NetworkAclId" : { "Ref" : "DBSubnetNetworkAcl" }
-      }
-    },
-
-	"DBSubnet2NetworkAclAssociation" : {
-      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "DBSubnet2" },
-        "NetworkAclId" : { "Ref" : "DBSubnetNetworkAcl" }
-      }
-    },
-	
-    "IPAddress" : {
-      "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "AttachGateway",
-      "Properties" : {
-        "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "SSHInstance" }
-      }
-    },
-
-	"ELBSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "GroupDescription" : "Allow web access via port 80 and 443 from anywhere",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
-          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0"}
-		 ],
-		 "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "ELB Web Default"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "DMZ"
-                    }
-                ]
-      }
-    },
-	
-	"WebSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "GroupDescription" : "Allow web applicaiton server access via port 80 and 443 from DMZ",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : { "Ref" : "DMZSubnet1CIDR"}},
-          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : { "Ref" : "DMZSubnet1CIDR"}},
-		  {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : { "Ref" : "DMZSubnet2CIDR"}},
-          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : { "Ref" : "DMZSubnet2CIDR"}}
-		 ],
-		 "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "Web Application"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Application"
-                    }
-                ]
-      }
-    },
-	
-    "SSHBastionSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "GroupDescription" : "Allow SSH access via port 22",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation"}}
-         ],
-		 "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "SSH Bastion"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "DMZ"
-                    }
-                ]
-      }
-    },
-
-    "MySQLSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "GroupDescription" : "Allow MySQL access via port 3306",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "3306", "ToPort" : "3306", "CidrIp" : { "Ref" : "AppSubnet1CIDR"}},
-		  {"IpProtocol" : "tcp", "FromPort" : "3306", "ToPort" : "3306", "CidrIp" : { "Ref" : "AppSubnet2CIDR"}}
-         ],
-		 "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "MySQL Default Port"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },	
-	
-    "PostgreSQLSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "GroupDescription" : "Allow PostgreSQL access via port 5432",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "5432", "ToPort" : "5432", "CidrIp" : { "Ref" : "AppSubnet1CIDR"}},
-		  {"IpProtocol" : "tcp", "FromPort" : "5432", "ToPort" : "5432", "CidrIp" : { "Ref" : "AppSubnet2CIDR"}}
-         ],
-		 "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "PostgreSQL Default Port"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },
-
-    "OracleSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "GroupDescription" : "Allow Oracle access via port 1521",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "1521", "ToPort" : "1521", "CidrIp" : { "Ref" : "AppSubnet1CIDR"}},
-		  {"IpProtocol" : "tcp", "FromPort" : "1521", "ToPort" : "1521", "CidrIp" : { "Ref" : "AppSubnet2CIDR"}}
-         ],
-		 "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "Oracle Default Port"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },
-	
-    "MSSQLSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "GroupDescription" : "Allow MSSQL access via port 1433",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "1433", "ToPort" : "1433", "CidrIp" : { "Ref" : "AppSubnet1CIDR"}},
-		  {"IpProtocol" : "tcp", "FromPort" : "1433", "ToPort" : "1433", "CidrIp" : { "Ref" : "AppSubnet2CIDR"}}
-         ],
-		 "Tags" : [
-                    {
-                        "Key": "Name",
-                        "Value": "MSSQL Default"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    },
-					{
-                        "Key": "Zone",
-                        "Value": "Database"
-                    }
-                ]
-      }
-    },	
-
-    "SSHInstance" : {
-      "Type" : "AWS::EC2::Instance",
-      "DependsOn" : "AttachGateway",
-      "Properties" : {
-        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
-        "InstanceType" : { "Ref" : "InstanceType" },
-        "KeyName" : { "Ref" : "KeyName" },
-        "Tags" : [ 
-					{
-						"Key" : "Name",
-						"Value" : "SSH Bastion"
+	"Metadata" : {
+		"AWS::CloudFormation::Interface" : {
+			"ParameterGroups" : [{
+					"Label" : {
+						"default" : "Network Configuration"
 					},
-					{
+					"Parameters" : [
+						"VPCCIDR",
+						"DMZSubnet1CIDR",
+						"DMZSubnet2CIDR",
+						"AppSubnet1CIDR",
+						"AppSubnet2CIDR",
+						"DBSubnet1CIDR",
+						"DBSubnet2CIDR"
+					]
+				}
+			],
+			"ParameterLabels" : {
+				"VPCCIDR" : {
+					"default" : "VPC Size"
+				},
+				"DMZSubnet1CIDR" : {
+					"default" : "DMZ Subnet Size(AZ1)"
+				},
+				"DMZSubnet2CIDR" : {
+					"default" : "DMZ Subnet Size(AZ2)"
+				},
+				"AppSubnet1CIDR" : {
+					"default" : "Application Subnet Size(AZ1)"
+				},
+				"AppSubnet2CIDR" : {
+					"default" : "Application Subnet Size(AZ2)"
+				},
+				"DBSubnet1CIDR" : {
+					"default" : "Database Subnet Size(AZ1)"
+				},
+				"DBSubnet2CIDR" : {
+					"default" : "Database Subnet Size(AZ2)"
+				}
+			}
+		}
+	},
+	"Parameters" : {
+		"VPCCIDR" : {
+			"AllowedPattern" : "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription" : "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default" : "10.0.0.0/16",
+			"Description" : "CIDR Block for the VPC",
+			"Type" : "String"
+		},
+		"DMZSubnet1CIDR" : {
+			"AllowedPattern" : "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription" : "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default" : "10.0.0.0/24",
+			"Description" : "CIDR Block for the public DMZ subnet 1 located in Availability Zone 1",
+			"Type" : "String"
+		},
+		"DMZSubnet2CIDR" : {
+			"AllowedPattern" : "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription" : "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default" : "10.0.1.0/24",
+			"Description" : "CIDR Block for the public DMZ subnet 2 located in Availability Zone 2",
+			"Type" : "String"
+		},
+		"AppSubnet1CIDR" : {
+			"AllowedPattern" : "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription" : "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default" : "10.0.2.0/24",
+			"Description" : "CIDR block for the private application subnet 1 located in Availability Zone 1.",
+			"Type" : "String"
+		},
+		"AppSubnet2CIDR" : {
+			"AllowedPattern" : "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription" : "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default" : "10.0.3.0/24",
+			"Description" : "CIDR block for the private application subnet 2 located in Availability Zone 2.",
+			"Type" : "String"
+		},
+		"DBSubnet1CIDR" : {
+			"AllowedPattern" : "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription" : "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default" : "10.0.4.0/24",
+			"Description" : "CIDR block for the private database subnet 1 located in Availability Zone 1.",
+			"Type" : "String"
+		},
+		"DBSubnet2CIDR" : {
+			"AllowedPattern" : "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription" : "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default" : "10.0.5.0/24",
+			"Description" : "CIDR block for the private database subnet 2 located in Availability Zone 2.",
+			"Type" : "String"
+		}
+	},
+
+	"Resources" : {
+
+		"VPC" : {
+			"Type" : "AWS::EC2::VPC",
+			"Properties" : {
+				"CidrBlock" : {
+					"Ref" : "VPCCIDR"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}
+				]
+			}
+		},
+
+		"DMZSubnet1" : {
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "DMZSubnet1CIDR"
+				},
+				"AvailabilityZone" : {
+					"Fn::Select" : [
+						"0", {
+							"Fn::GetAZs" : ""
+						}
+					]
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "DMZ subnet 1"
+					}, {
 						"Key" : "Network",
 						"Value" : "Public"
-					}			
-			],
-        "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "SSHBastionSecurityGroup" }],
-          "AssociatePublicIpAddress" : "false",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "DMZSubnet2" }
-        }]
-       }
-    }
-  },
+					}, {
+						"Key" : "Zone",
+						"Value" : "DMZ"
+					}
+				]
+			}
+		},
 
-  "Outputs" : {
-  "BastionInstanceID" : {
-    "Description": "The Instance ID",  
-    "Value" : { "Ref" : "SSHInstance" }
-  },
-  "SSHBastionIP" : {
-    "Description": "The Instance IP",  
-    "Value" : { "Ref" : "IPAddress" }
-  }
-  }
+		"DMZSubnet2" : {
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "DMZSubnet2CIDR"
+				},
+				"AvailabilityZone" : {
+					"Fn::Select" : [
+						"1", {
+							"Fn::GetAZs" : ""
+						}
+					]
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "DMZ subnet 2"
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Zone",
+						"Value" : "DMZ"
+					}
+				]
+			}
+		},
+
+		"AppSubnet1" : {
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "AppSubnet1CIDR"
+				},
+				"AvailabilityZone" : {
+					"Fn::Select" : [
+						"0", {
+							"Fn::GetAZs" : ""
+						}
+					]
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "Application subnet 1"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Application"
+					}
+				]
+			}
+		},
+
+		"AppSubnet2" : {
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "AppSubnet2CIDR"
+				},
+				"AvailabilityZone" : {
+					"Fn::Select" : [
+						"1", {
+							"Fn::GetAZs" : ""
+						}
+					]
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "Application subnet 2"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Application"
+					}
+				]
+			}
+		},
+
+		"DBSubnet1" : {
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "DBSubnet1CIDR"
+				},
+				"AvailabilityZone" : {
+					"Fn::Select" : [
+						"0", {
+							"Fn::GetAZs" : ""
+						}
+					]
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "Database subnet 1"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		},
+
+		"DBSubnet2" : {
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "DBSubnet2CIDR"
+				},
+				"AvailabilityZone" : {
+					"Fn::Select" : [
+						"1", {
+							"Fn::GetAZs" : ""
+						}
+					]
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "Database subnet 2"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		},
+
+		"InternetGateway" : {
+			"Type" : "AWS::EC2::InternetGateway",
+			"Properties" : {
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}
+				]
+			}
+		},
+
+		"AttachGateway" : {
+			"Type" : "AWS::EC2::VPCGatewayAttachment",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"InternetGatewayId" : {
+					"Ref" : "InternetGateway"
+				}
+			}
+		},
+
+		"DMZRouteTable" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Zone",
+						"Value" : "DMZ"
+					}
+				]
+			}
+		},
+
+		"AppRouteTable1" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Application"
+					}
+				]
+			}
+		},
+
+		"AppRouteTable2" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Application"
+					}
+				]
+			}
+		},
+
+		"DBRouteTable" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		},
+		"DMZRoute" : {
+			"Type" : "AWS::EC2::Route",
+			"DependsOn" : "AttachGateway",
+			"Properties" : {
+				"RouteTableId" : {
+					"Ref" : "DMZRouteTable"
+				},
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"GatewayId" : {
+					"Ref" : "InternetGateway"
+				}
+			}
+		},
+
+		"DMZSubnet1RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DMZSubnet1"
+				},
+				"RouteTableId" : {
+					"Ref" : "DMZRouteTable"
+				}
+			}
+		},
+
+		"DMZSubnet2RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DMZSubnet2"
+				},
+				"RouteTableId" : {
+					"Ref" : "DMZRouteTable"
+				}
+			}
+		},
+
+		"AppSubnet1RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "AppSubnet1"
+				},
+				"RouteTableId" : {
+					"Ref" : "AppRouteTable1"
+				}
+			}
+		},
+
+		"AppSubnet2RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "AppSubnet2"
+				},
+				"RouteTableId" : {
+					"Ref" : "AppRouteTable2"
+				}
+			}
+		},
+
+		"DBSubnet1RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DBSubnet1"
+				},
+				"RouteTableId" : {
+					"Ref" : "DBRouteTable"
+				}
+			}
+		},
+
+		"DBSubnet2RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DBSubnet2"
+				},
+				"RouteTableId" : {
+					"Ref" : "DBRouteTable"
+				}
+			}
+		},
+
+		"DMZSubnetNetworkAcl" : {
+			"Type" : "AWS::EC2::NetworkAcl",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Zone",
+						"Value" : "DMZ"
+					}
+				]
+			}
+		},
+
+		"AppSubnetNetworkAcl" : {
+			"Type" : "AWS::EC2::NetworkAcl",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Application"
+					}
+				]
+			}
+		},
+
+		"DBSubnetNetworkAcl" : {
+			"Type" : "AWS::EC2::NetworkAcl",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		},
+
+		"DMZInboundSSHNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "110",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "22",
+					"To" : "22"
+				}
+			}
+		},
+
+		"DMZOutBoundSSHNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "110",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "22",
+					"To" : "22"
+				}
+			}
+		},
+
+		"DMZInboundHttpNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "120",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "80",
+					"To" : "80"
+				}
+			}
+		},
+
+		"DMZOutBoundHttpNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "120",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "80",
+					"To" : "80"
+				}
+			}
+		},
+
+		"DMZInboundHttpsNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "130",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "443",
+					"To" : "443"
+				}
+			}
+		},
+
+		"DMZOutBoundHttpsNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "130",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "443",
+					"To" : "443"
+				}
+			}
+		},
+
+		"DMZInboundHighNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "140",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "1024",
+					"To" : "65535"
+				}
+			}
+		},
+
+		"DMZOutBoundHighNetworkAclEntry" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				},
+				"RuleNumber" : "140",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : "0.0.0.0/0",
+				"PortRange" : {
+					"From" : "1024",
+					"To" : "65535"
+				}
+			}
+		},
+
+		"DMZSubnet1NetworkAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DMZSubnet1"
+				},
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				}
+			}
+		},
+
+		"DMZSubnet2NetworkAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DMZSubnet2"
+				},
+				"NetworkAclId" : {
+					"Ref" : "DMZSubnetNetworkAcl"
+				}
+			}
+		},
+
+		"AppInboundAllNetworkAclEntry1" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "AppSubnetNetworkAcl"
+				},
+				"RuleNumber" : "110",
+				"Protocol" : "-1",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : {
+					"Ref" : "VPCCIDR"
+				}
+			}
+		},
+
+		"AppOutBoundAllNetworkAclEntry1" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "AppSubnetNetworkAcl"
+				},
+				"RuleNumber" : "110",
+				"Protocol" : "-1",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : {
+					"Ref" : "VPCCIDR"
+				}
+			}
+		},
+
+		"AppSubnet1NetworkAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "AppSubnet1"
+				},
+				"NetworkAclId" : {
+					"Ref" : "AppSubnetNetworkAcl"
+				}
+			}
+		},
+
+		"AppSubnet2NetworkAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "AppSubnet2"
+				},
+				"NetworkAclId" : {
+					"Ref" : "AppSubnetNetworkAcl"
+				}
+			}
+		},
+
+		"DBInboundAllNetworkAclEntry1" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DBSubnetNetworkAcl"
+				},
+				"RuleNumber" : "110",
+				"Protocol" : "-1",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : {
+					"Ref" : "AppSubnet1CIDR"
+				}
+			}
+		},
+
+		"DBOutBoundAllNetworkAclEntry1" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DBSubnetNetworkAcl"
+				},
+				"RuleNumber" : "110",
+				"Protocol" : "-1",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : {
+					"Ref" : "AppSubnet1CIDR"
+				}
+			}
+		},
+
+		"DBInboundAllNetworkAclEntry2" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DBSubnetNetworkAcl"
+				},
+				"RuleNumber" : "120",
+				"Protocol" : "-1",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : {
+					"Ref" : "AppSubnet2CIDR"
+				}
+			}
+		},
+
+		"DBOutBoundAllNetworkAclEntry2" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : {
+					"Ref" : "DBSubnetNetworkAcl"
+				},
+				"RuleNumber" : "120",
+				"Protocol" : "-1",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : {
+					"Ref" : "AppSubnet2CIDR"
+				}
+			}
+		},
+
+		"DBSubnet1NetworkAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DBSubnet1"
+				},
+				"NetworkAclId" : {
+					"Ref" : "DBSubnetNetworkAcl"
+				}
+			}
+		},
+
+		"DBSubnet2NetworkAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "DBSubnet2"
+				},
+				"NetworkAclId" : {
+					"Ref" : "DBSubnetNetworkAcl"
+				}
+			}
+		},
+
+		"NATGWEIP1" : {
+			"Type" : "AWS::EC2::EIP",
+			"DependsOn" : "AttachGateway",
+			"Properties" : {
+				"Domain" : "vpc"
+			}
+		},
+
+		"NATGWEIP2" : {
+			"Type" : "AWS::EC2::EIP",
+			"DependsOn" : "AttachGateway",
+			"Properties" : {
+				"Domain" : "vpc"
+			}
+		},
+
+		"NATGateway1" : {
+			"Type" : "AWS::EC2::NatGateway",
+			"DependsOn" : "AttachGateway",
+			"Properties" : {
+				"AllocationId" : {
+					"Fn::GetAtt" : ["NATGWEIP1", "AllocationId"]
+				},
+				"SubnetId" : {
+					"Ref" : "DMZSubnet1"
+				}
+			}
+		},
+
+		"NATGateway2" : {
+			"Type" : "AWS::EC2::NatGateway",
+			"DependsOn" : "AttachGateway",
+			"Properties" : {
+				"AllocationId" : {
+					"Fn::GetAtt" : ["NATGWEIP2", "AllocationId"]
+				},
+				"SubnetId" : {
+					"Ref" : "DMZSubnet2"
+				}
+			}
+		},
+
+		"NATGWRoute1" : {
+			"Type" : "AWS::EC2::Route",
+			"Properties" : {
+				"RouteTableId" : {
+					"Ref" : "AppRouteTable1"
+				},
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"NatGatewayId" : {
+					"Ref" : "NATGateway1"
+				}
+			}
+		},
+
+		"NATGWRoute2" : {
+			"Type" : "AWS::EC2::Route",
+			"Properties" : {
+				"RouteTableId" : {
+					"Ref" : "AppRouteTable2"
+				},
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"NatGatewayId" : {
+					"Ref" : "NATGateway2"
+				}
+			}
+		},
+
+		"ELBSecurityGroup" : {
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"GroupDescription" : "Allow web access via port 80 and 443 from anywhere",
+				"SecurityGroupIngress" : [{
+						"IpProtocol" : "tcp",
+						"FromPort" : "80",
+						"ToPort" : "80",
+						"CidrIp" : "0.0.0.0/0"
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "443",
+						"ToPort" : "443",
+						"CidrIp" : "0.0.0.0/0"
+					}
+				],
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "ELB Web Default"
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Zone",
+						"Value" : "DMZ"
+					}
+				]
+			}
+		},
+
+		"WebSecurityGroup" : {
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"GroupDescription" : "Allow web applicaiton server access via port 80 and 443 from DMZ",
+				"SecurityGroupIngress" : [{
+						"IpProtocol" : "tcp",
+						"FromPort" : "80",
+						"ToPort" : "80",
+						"CidrIp" : {
+							"Ref" : "DMZSubnet1CIDR"
+						}
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "443",
+						"ToPort" : "443",
+						"CidrIp" : {
+							"Ref" : "DMZSubnet1CIDR"
+						}
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "80",
+						"ToPort" : "80",
+						"CidrIp" : {
+							"Ref" : "DMZSubnet2CIDR"
+						}
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "443",
+						"ToPort" : "443",
+						"CidrIp" : {
+							"Ref" : "DMZSubnet2CIDR"
+						}
+					}
+				],
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "Web Application"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Application"
+					}
+				]
+			}
+		},
+
+		"MySQLSecurityGroup" : {
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"GroupDescription" : "Allow MySQL access via port 3306",
+				"SecurityGroupIngress" : [{
+						"IpProtocol" : "tcp",
+						"FromPort" : "3306",
+						"ToPort" : "3306",
+						"CidrIp" : {
+							"Ref" : "AppSubnet1CIDR"
+						}
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "3306",
+						"ToPort" : "3306",
+						"CidrIp" : {
+							"Ref" : "AppSubnet2CIDR"
+						}
+					}
+				],
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "MySQL Default Port"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		},
+
+		"PostgreSQLSecurityGroup" : {
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"GroupDescription" : "Allow PostgreSQL access via port 5432",
+				"SecurityGroupIngress" : [{
+						"IpProtocol" : "tcp",
+						"FromPort" : "5432",
+						"ToPort" : "5432",
+						"CidrIp" : {
+							"Ref" : "AppSubnet1CIDR"
+						}
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "5432",
+						"ToPort" : "5432",
+						"CidrIp" : {
+							"Ref" : "AppSubnet2CIDR"
+						}
+					}
+				],
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "PostgreSQL Default Port"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		},
+
+		"OracleSecurityGroup" : {
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"GroupDescription" : "Allow Oracle access via port 1521",
+				"SecurityGroupIngress" : [{
+						"IpProtocol" : "tcp",
+						"FromPort" : "1521",
+						"ToPort" : "1521",
+						"CidrIp" : {
+							"Ref" : "AppSubnet1CIDR"
+						}
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "1521",
+						"ToPort" : "1521",
+						"CidrIp" : {
+							"Ref" : "AppSubnet2CIDR"
+						}
+					}
+				],
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "Oracle Default Port"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		},
+
+		"MSSQLSecurityGroup" : {
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"GroupDescription" : "Allow MSSQL access via port 1433",
+				"SecurityGroupIngress" : [{
+						"IpProtocol" : "tcp",
+						"FromPort" : "1433",
+						"ToPort" : "1433",
+						"CidrIp" : {
+							"Ref" : "AppSubnet1CIDR"
+						}
+					}, {
+						"IpProtocol" : "tcp",
+						"FromPort" : "1433",
+						"ToPort" : "1433",
+						"CidrIp" : {
+							"Ref" : "AppSubnet2CIDR"
+						}
+					}
+				],
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "MSSQL Default"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Zone",
+						"Value" : "Database"
+					}
+				]
+			}
+		}
+	},
+
+	"Outputs" : {
+		"VPCID" : {
+			"Description" : "The VPC ID",
+			"Value" : {
+				"Ref" : "VPC"
+			}
+		},
+
+		"DMZ1ID" : {
+			"Description" : "The DMZ Subnet 1 ID",
+			"Value" : {
+				"Ref" : "DMZSubnet1"
+			}
+		},
+
+		"DMZ2ID" : {
+			"Description" : "The DMZ Subnet 2 ID",
+			"Value" : {
+				"Ref" : "DMZSubnet2"
+			}
+		},
+
+		"App1ID" : {
+			"Description" : "The App Subnet 1 ID",
+			"Value" : {
+				"Ref" : "AppSubnet1"
+			}
+		},
+
+		"App2ID" : {
+			"Description" : "The App Subnet 2 ID",
+			"Value" : {
+				"Ref" : "AppSubnet2"
+			}
+		},
+
+		"DB1ID" : {
+			"Description" : "The DB Subnet 1 ID",
+			"Value" : {
+				"Ref" : "DBSubnet1"
+			}
+		},
+
+		"DB2ID" : {
+			"Description" : "The DB Subnet 2 ID",
+			"Value" : {
+				"Ref" : "DBSubnet2"
+			}
+		},
+
+		"NATGWIP1" : {
+			"Description" : "The NAT Gateway 1 IP",
+			"Value" : {
+				"Ref" : "NATGWEIP1"
+			}
+		},
+
+		"NATGWIP2" : {
+			"Description" : "The NAT Gateway 2 IP",
+			"Value" : {
+				"Ref" : "NATGWEIP2"
+			}
+		}
+	}
 }
-
