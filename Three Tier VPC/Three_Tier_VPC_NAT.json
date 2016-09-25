@@ -1,7 +1,7 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
 
-	"Description" : "There is a basic 3-tier VPC.",
+	"Description" : "There is a 3-tier VPC with NAT Gateway.***NOTICE*** NAT Gateway not available in  São Paulo Region.(2016/09/25)",
 
 	"Metadata" : {
 		"AWS::CloudFormation::Interface" : {

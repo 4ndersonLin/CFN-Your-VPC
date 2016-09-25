@@ -1,7 +1,7 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
 
-	"Description" : "There is 3-tier VPC with a SSH Bastion. ***NOTICE*** Before you create this VPC stack, you must create an key pair by using console or CLI.",
+	"Description" : "There is a 3-tier VPC with a SSH Bastion. ***NOTICE*** Before you create this VPC stack, you must create an key pair by using console or CLI.",
 
 	"Metadata" : {
 		"AWS::CloudFormation::Interface" : {
