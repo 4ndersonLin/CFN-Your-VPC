@@ -9,6 +9,10 @@
     5. 較高安全性的VPC架構: 建立VPC、Subnet、Route Table、進階的NACL、Security Group。(參照AWS NACL、Security Group的建議和筆者的經驗調整規則)In Process.........
 ###**兩層式架構VPC**(包含DMZ、Trust Zone兩層)
     1. In Process.........
+##使用
+###AWS Web Console
+
+###AWS CLI
 
 # CFN-Your-VPC
 Provide basic AWS VPC architecture with cloudformation. Stop create VPC by using wizzard or step-by-step right now.
