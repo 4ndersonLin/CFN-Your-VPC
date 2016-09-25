@@ -16,5 +16,7 @@
 
 ###AWS CLI
 
+##備註
+CloudFormation在2016/09/16支援了YAML格式，後續也會陸續提供YAML格式的範本。(2016/09/26)
 # CFN-Your-VPC
 Provide several type AWS VPC architecture with cloudformation. Stop create VPC by using wizzard or step-by-step right now.
