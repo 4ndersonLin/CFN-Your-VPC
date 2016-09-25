@@ -1074,6 +1074,7 @@
   },
 
   "Outputs" : {
+  "VPCID" : {
       "Description": "The VPC ID",  
     "Value" : { "Ref" : "VPC" }
   },
@@ -1119,3 +1120,4 @@
   }
   }
 }
+
