@@ -1074,14 +1074,48 @@
   },
 
   "Outputs" : {
+      "Description": "The VPC ID",  
+    "Value" : { "Ref" : "VPC" }
+  },
+  
+  "DMZ1ID" : {
+    "Description": "The DMZ Subnet 1 ID",  
+    "Value" : { "Ref" : "DMZSubnet1" }
+  },
+  
+  "DMZ2ID" : {
+    "Description": "The DMZ Subnet 2 ID",  
+    "Value" : { "Ref" : "DMZSubnet2" }
+  }, 
+  
+  "App1ID" : {
+    "Description": "The App Subnet 1 ID",  
+    "Value" : { "Ref" : "AppSubnet1" }
+  },
+  
+  "App2ID" : {
+    "Description": "The App Subnet 2 ID",  
+    "Value" : { "Ref" : "AppSubnet2" }
+  },
+  
+  "DB1ID" : {
+    "Description": "The DB Subnet 1 ID",  
+    "Value" : { "Ref" : "DBSubnet1" }
+  },
+  
+  "DB2ID" : {
+    "Description": "The DB Subnet 2 ID",  
+    "Value" : { "Ref" : "DBSubnet2" }
+  },
+  
   "BastionInstanceID" : {
     "Description": "The Instance ID",  
     "Value" : { "Ref" : "SSHInstance" }
   },
+  
   "SSHBastionIP" : {
     "Description": "The Instance IP",  
     "Value" : { "Ref" : "IPAddress" }
   }
   }
 }
-
