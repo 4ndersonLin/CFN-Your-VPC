@@ -2,11 +2,43 @@
 提供幾種CloudFormation可用的基本VPC架構。
 ##比較
 CloudFormation VS Wizzard, Step-by-step
-    | 水果        | 价格    |  数量  |
-    | --------   | -----:   | :----: |
-    | 香蕉        | $1      |   5    |
-    | 苹果        | $1      |   6    |
-    | 草莓        | $1      |   7    |
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-lqy6{text-align:right;vertical-align:top}
+.tg .tg-yw4l{vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-lqy6">aaa</th>
+    <th class="tg-lqy6">bbb</th>
+    <th class="tg-lqy6">ccc</th>
+    <th class="tg-yw4l"></th>
+    <th class="tg-yw4l"></th>
+  </tr>
+  <tr>
+    <td class="tg-lqy6"></td>
+    <td class="tg-lqy6"></td>
+    <td class="tg-lqy6"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+  </tr>
+  <tr>
+    <td class="tg-lqy6"></td>
+    <td class="tg-lqy6"></td>
+    <td class="tg-lqy6"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+  </tr>
+</table>
 ##架構
 ###**三層式架構VPC**(包含DMZ、Application、Database三層)
 1. 基本型的VPC架構: 建立VPC、Subnet、Route Table、基本的NACL、常用的Security Group。
