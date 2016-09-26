@@ -1,5 +1,5 @@
 # CFN-Your-VPC
-提供幾種CloudFormation可用的基本VPC架構。
+提供數種可透過CloudFormation佈署的VPC架構。
 ##比較
 CloudFormation VS Wizzard, Step-by-step
 <table>
