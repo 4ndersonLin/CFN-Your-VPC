@@ -1,7 +1,7 @@
 # CFN-Your-VPC
 提供幾種CloudFormation可用的基本VPC架構。
 ##比較
-VS Wizzard, Step-by-step
+CloudFormation VS Wizzard, Step-by-step
 
 ##架構
 ###**三層式架構VPC**(包含DMZ、Application、Database三層)
