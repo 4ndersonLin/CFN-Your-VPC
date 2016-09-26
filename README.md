@@ -2,41 +2,30 @@
 提供幾種CloudFormation可用的基本VPC架構。
 ##比較
 CloudFormation VS Wizzard, Step-by-step
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg .tg-lqy6{text-align:right;vertical-align:top}
-.tg .tg-yw4l{vertical-align:top}
-</style>
-<table class="tg">
+<table>
   <tr>
-    <th class="tg-lqy6">aaa</th>
-    <th class="tg-lqy6">bbb</th>
-    <th class="tg-lqy6">ccc</th>
-    <th class="tg-yw4l"></th>
-    <th class="tg-yw4l"></th>
+    <th></th>
+    <th>CloudFormation</th>
+    <th>VPC Wizzard</th>
+    <th>Step-by-step</th>
   </tr>
   <tr>
-    <td class="tg-lqy6"></td>
-    <td class="tg-lqy6"></td>
-    <td class="tg-lqy6"></td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
+    <td>難易度</td>
+    <td>中</td>
+    <td>低</td>
+    <td>高</td>
   </tr>
   <tr>
-    <td class="tg-lqy6"></td>
-    <td class="tg-lqy6"></td>
-    <td class="tg-lqy6"></td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
+    <td>時間</td>
+    <td>低</td>
+    <td>中</td>
+    <td>長</td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
+    <td>彈性</td>
+    <td>高</td>
+    <td>低</td>
+    <td>高</td>
   </tr>
 </table>
 ##架構
