@@ -2,7 +2,11 @@
 提供幾種CloudFormation可用的基本VPC架構。
 ##比較
 CloudFormation VS Wizzard, Step-by-step
-
+|   |   |   |   |   |
+|---|---|---|---|---|
+|   |   |   |   |   |
+|   |   |   |   |   |
+|   |   |   |   |   |
 ##架構
 ###**三層式架構VPC**(包含DMZ、Application、Database三層)
 1. 基本型的VPC架構: 建立VPC、Subnet、Route Table、基本的NACL、常用的Security Group。
